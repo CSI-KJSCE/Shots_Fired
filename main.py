@@ -5,12 +5,18 @@ import sys
 #bullets collision
 #obj collision
 
+
 player_x1 = 50
 player_y1 = 50
 
 player_x2 = 750
 player_y2 = 750
 
+curr_x1 = player_x1 + 20
+curr_y1 = player_y1
+
+curr_y2 =player_y2
+curr_x2 = player_x2 + 20
 py.init()
 done = False
 tank1 = py.image.load('tank1.jpg')    #hero size is 40x40
@@ -41,7 +47,7 @@ def bullet_2(bullet_x,bullet_y):
 
 def main():
     draw()
-    global player_x1, player_y1,player_x2, player_y2
+    global player_x1, player_y1,player_x2, player_y2,curr_y1,curr_y2,curr_x1,curr_x2
     global done
 
     while not done:
