@@ -1,10 +1,10 @@
 import pygame as py
-import os
-import sys
+import os,sys,random
 
-#bullets collision
-#obj collision
-
+#1.obstacle generator and bullet correction after hitting target
+#2.obj collision
+#3.Rotation at a fixed place
+#4.firing bullets while rotating
 
 player_x1 = 50
 player_y1 = 50
@@ -19,20 +19,24 @@ curr_y2 =player_y2
 curr_x2 = player_x2 + 20
 py.init()
 done = False
-tank1 = py.image.load('tank1.jpg')    #hero size is 40x40
-tank2 = py.image.load('tank1.jpg')    #image size is 40x40
-bullet1 = py.image.load('bullet1.png')
-bullet2 = py.image.load('bullet1.png')
 
+tank1 = py.image.load('realtank.png')
+tank2 = py.image.load('realtank.png')    #image size is 40x40
+bullet1 = py.image.load('missile.png')
+bullet2 = py.image.load('missile.png')
+background = py.image.load('background.jpg')
+obstacle = py.image.load('rock.png')
 
 def draw():
     screen = py.display.set_mode((800,800))
+    screen.blit(background,[0,0])               #setting the background image
     screen.blit(tank1,(player_x1,player_y1))     #setting the tank1 pos
     screen.blit(tank2,(player_x2, player_y2))    #setting the tank2 pos
     py.display.flip()  # used to view the updates on screen as soon as we see them.
 
 def bullet_1(bullet_x,bullet_y):
     screen = py.display.set_mode((800,800))
+    screen.blit(background, [0, 0])
     screen.blit(tank1, (player_x1, player_y1))  # setting the tank1 pos
     screen.blit(tank2, (player_x2, player_y2))
     screen.blit(bullet1,(bullet_x,bullet_y))
@@ -40,10 +44,15 @@ def bullet_1(bullet_x,bullet_y):
 
 def bullet_2(bullet_x,bullet_y):
     screen = py.display.set_mode((800,800))
+    screen.blit(background, [0, 0])
     screen.blit(tank1, (player_x1, player_y1))  # setting the tank1 pos
     screen.blit(tank2, (player_x2, player_y2))
     screen.blit(bullet2,(bullet_x,bullet_y))
     py.display.flip()
+
+def obstacle_generator():
+    #create a 2d array of x and y positions showing the obstacle values (global).
+    #after that iterate through it and intialize by creating another function.
 
 def main():
     draw()
