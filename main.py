@@ -46,6 +46,10 @@ bullet2 = py.image.load('missile.png')
 background = py.image.load('background.jpg')
 obstacle = py.image.load('rock.png')
 
+screen = py.display.set_mode((800, 800))
+screen.blit(background,[0,0])
+
+
 rect1 = tank1.get_rect()
 rect2 = tank2.get_rect()
 
@@ -59,7 +63,7 @@ def draw_obstacles(screen):
 def draw():
     global tank1, tank2,screen,new_image1,new_image2
     screen = py.display.set_mode((800,800))
-    # screen.blit(background,[0,0])               #setting the background image
+    screen.blit(background,[0,0])               #setting the background image
     draw_obstacles(screen)
     screen.blit(new_image1,rect1)  # setting the tank1 pos
     screen.blit(new_image2,rect2)
@@ -98,8 +102,8 @@ def main():
                 done = True
 
         if keys_pressed[py.K_a]:
-            player_x1 = (player_x1 + (10 * (math.cos(tank_rot_1))) * 0.03)  # iterations are fixed. So constant length of width which is getting added .
-            player_y1 = (player_y1 + (10 * (math.sin(tank_rot_1))) * 0.03)
+            player_x1 = (player_x1 + (10 * (math.cos(tank_rot_1))) * 0.3)  # iterations are fixed. So constant length of width which is getting added .
+            player_y1 = (player_y1 + (10 * (math.sin(tank_rot_1))) * 0.3)
             draw()
 
         if not keys_pressed[py.K_a]:
@@ -127,8 +131,8 @@ def main():
         #             bullet_1(curr_x1,curr_y1)
 
         if keys_pressed[py.K_UP]:
-            player_x2 = (player_x2 + (10 * (math.cos(tank_rot_2))) * 0.03)  # iterations are fixed. So constant length of width which is getting added .
-            player_y2 = (player_y2 + (10 * (math.sin(tank_rot_2))) * 0.03)
+            player_x2 = (player_x2 + (10 * (math.cos(tank_rot_2))) * 0.3)  # iterations are fixed. So constant length of width which is getting added .
+            player_y2 = (player_y2 + (10 * (math.sin(tank_rot_2))) * 0.3)
             draw()
 
         if not keys_pressed[py.K_UP]:
