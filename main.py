@@ -70,20 +70,56 @@ def draw():
     py.display.flip()  # used to view the updates on screen as soon as we see them.
 
 def bullet_1(bullet_x,bullet_y):
-    global tank1, tank2
+    global tank1, tank2,rect1,rect2,tank_rot_1,tank_rot_2,old_center_1,old_center_2,new_image_1,new_image_2
     screen = py.display.set_mode((800,800))
     # screen.blit(background, [0, 0])
     draw_obstacles(screen)
+    old_center_1 = rect1.center
+    # defining angle of the rotation
+    tank_rot_1 = (tank_rot_1 + rot_speed) % 360
+    # rotating the orignal image
+    new_image_1 = py.transform.rotate(tank1, tank_rot_1)
+    rect1 = new_image1.get_rect()
+    # set the rotated rectangle to the old center
+    rect1.center = old_center_1
+    # drawing the rotated rectangle to the screen
+    old_center_2 = rect2.center
+    # defining angle of the rotation
+    tank_rot_2 = (tank_rot_2 + rot_speed) % 360
+    # rotating the orignal image
+    new_image_2 = py.transform.rotate(tank2, tank_rot_2)
+    rect2 = new_image_2.get_rect()
+    # set the rotated rectangle to the old center
+    rect2.center = old_center_2
+    # drawing the rotated rectangle to the screen
     screen.blit(new_image1,rect1)  # setting the tank1 pos
     screen.blit(new_image2,rect2)
     screen.blit(bullet1,(bullet_x,bullet_y))
     py.display.flip()
 
 def bullet_2(bullet_x,bullet_y):
-    global tank1, tank2
-    screen = py.display.set_mode((800,800))
+    global tank1, tank2, rect1, rect2, tank_rot_1, tank_rot_2, old_center_1, old_center_2, new_image_1, new_image_2
+    screen = py.display.set_mode((800, 800))
     # screen.blit(background, [0, 0])
     draw_obstacles(screen)
+    old_center_1 = rect1.center
+    # defining angle of the rotation
+    tank_rot_1 = (tank_rot_1 + rot_speed) % 360
+    # rotating the orignal image
+    new_image_1 = py.transform.rotate(tank1, tank_rot_1)
+    rect1 = new_image1.get_rect()
+    # set the rotated rectangle to the old center
+    rect1.center = old_center_1
+    # drawing the rotated rectangle to the screen
+    old_center_2 = rect2.center
+    # defining angle of the rotation
+    tank_rot_2 = (tank_rot_2 + rot_speed) % 360
+    # rotating the orignal image
+    new_image_2 = py.transform.rotate(tank2, tank_rot_2)
+    rect2 = new_image_2.get_rect()
+    # set the rotated rectangle to the old center
+    rect2.center = old_center_2
+    # drawing the rotated rectangle to the screen
     screen.blit(new_image1, rect1)  # setting the tank1 pos
     screen.blit(new_image2, rect2)
     screen.blit(bullet2,(bullet_x,bullet_y))
@@ -118,8 +154,10 @@ def main():
 
         if keys_pressed[py.K_SPACE]:
             curr_x1,curr_y1 = (rect1.center)
+            bullet_rot_1 = (tank_rot_1 * 0.07)
             while curr_x1<=800 and curr_y1>=0:
-                curr_y1-=4
+                curr_x1 = (curr_x1 +(10 * (math.sin(bullet_rot_1))) * 0.1)  # iterations are fixed. So constant length of width which is getting added .
+                curr_y1 = (curr_y1 +(10 * (math.cos(bullet_rot_1))) * 0.1)  # quadrant
                 if curr_x1<=player_x2+40 and curr_x1>=player_x2:
                     print('Player1 Wins')
                     sys.exit(0)
@@ -146,13 +184,15 @@ def main():
 
         if keys_pressed[py.K_l]:
             curr_x2,curr_y2 = rect2.center
+            bullet_rot_2 = (tank_rot_2 * 0.07)
             while curr_x2 <= 800 and curr_y2 <= 800:
-                curr_y2 += 4
+                curr_x2 = (curr_x2 + (10 * (math.sin(bullet_rot_2))) * 0.1)  # iterations are fixed. So constant length of width which is getting added .
+                curr_y2 = (curr_y2 + (10 * (math.cos(bullet_rot_2))) * 0.1)
                 if curr_x2<=player_x1+40 and curr_x2>=player_x1:
                     print('Player2  Wins')
                     sys.exit(0)
                 elif curr_y2>curr_y1+4 and curr_y2<curr_y1+4 :     #bullets collision
-                    bullet1(900,900)
+                    bullet1(900, 900)
                     bullet2(900, 900)
                 else:
                     bullet_2(curr_x2,curr_y2)
