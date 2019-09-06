@@ -175,7 +175,7 @@ def main():
     global rect1,rect2,new_image1,new_image2
     global done
     while not done:
-cd
+
         keys_pressed = py.key.get_pressed()
 
         for event in py.event.get():
