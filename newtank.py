@@ -3,7 +3,7 @@ import sys, random, math
 
 screen = py.display.set_mode((800,800))
 py.init()
-tank_image = py.image.load('realtank.png')
+tank_image = py.image.load('resized_tank_green.png')
 obstacle_image = py.image.load('rock.png')
 bullet_image = py.image.load('missile.png')
 
