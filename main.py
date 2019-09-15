@@ -1,274 +1,174 @@
 import pygame as py
-import sys,random
-import math
+import sys, random, math
 
-screen = py.display.set_mode((800, 800))
-tank_rot_1= 0
-tank_rot_2= 0
-
-
+screen = py.display.set_mode((800,800))
 py.init()
-done = False
+tank_image1 = py.image.load('tank_green.png')
+tank_image2 = py.image.load('tank_red.png')
+obstacle_image = py.image.load('rock.png')
+bullet_image = py.image.load('missile.png')
 
+tank_dimensions = tank_image1.get_size()
+obstacle_dimensions = obstacle_image.get_size()
+bullet_dimensions = bullet_image.get_size()
 
-cord = [(random.randint(40,800),random.randint(40,800)) for i in range(30)]   #array of co ordinates
+game_clock = py.time.Clock()
 
-tank1 = py.image.load('realtank.png')
-tank2 = py.image.load('realtank.png')    #image size is 40x40
-bullet1 = py.image.load('missile.png')
-bullet2 = py.image.load('missile.png')
-background = py.image.load('background.jpg')
-obstacle = py.image.load('rock.png')
+tank_rect = tank_image1.get_rect()
+color = (0,0,0)
 
-rect1 = tank1.get_rect()
-rect2 = tank2.get_rect()
+Tank = {
+    'tank1' : {
+        'image' : tank_image1,
+        'new_image' : tank_image1,
+        'rect' : tank_image1.get_rect().copy(),
+        'center' : (25,25),
+        'angle' : 0,
+        'bullet' : {
+            'image' : bullet_image,
+            'rect' : bullet_image.get_rect()
+        }
+    },
 
-rect1.center = (25,25)
-rect2.center =(500,500)
+    'tank2' : {
+        'image' : tank_image2,
+        'new_image' : tank_image2,
+        'rect' : tank_image2.get_rect().copy(),
+        'center' : (750,750),
+        'angle' : 0,
+        'bullet' : {
+            'image' : bullet_image,
+            'rect' : bullet_image.get_rect()
+        }
+    }    
+}
 
-new_image_1 = tank1
-new_image_2 = tank2
+Tank['tank1']['rect'].center = (25,25)
+Tank['tank2']['rect'].center = (750,750)
+obstacles = [(random.randint(40,700),random.randint(40,700)) for i in range(30)]
 
-def draw_obstacles(screen):
-    for i,j in cord:
-        screen.blit(obstacle, (i, j))
+#checks if the point x,y lies in the circle (x-x1)^2 + (y-y1)^2 = r^2
+def collision(x,y,x1,y1,r):
+    term = (x-x1)**2 + (y-y1)**2
+    return term <= r**2
 
-def tank_1_win_check(bulletx,bullety):
-    lose = False
-    (tank_2_x , tank_2_y )= rect2.center
-    equation = lambda x, y: (x - tank_2_x) ** 2 + (y - tank_2_y) ** 2 - 400
-    if equation(bulletx,bullety)<=0:
-        lose = True
-        return lose
-
+def obstacle_collision(x,y):
+    radius_obstacle = obstacle_dimensions[0]
+    for i,j in obstacles:
+        i,j = i+radius_obstacle, j+radius_obstacle
+        if collision(x,y,i,j,radius_obstacle):
+            return True
     return False
-
-def tank_2_win_check(bulletx,bullety):
-    lose = False
-    (tank_1_x , tank_1_y )= rect1.center
-    equation = lambda x, y: (x - tank_1_x) ** 2 + (y - tank_1_y) ** 2 - 400
-    if equation(bulletx,bullety)<=0:
-        lose = True
-        return lose
-
-    return False
-
-def bullet_check_1(bulletx,bullety):
-    movable = True
-
-    for i,j in cord:
-        obs_x=i+14
-        obs_y=j+14
-        equation = lambda x,y: (x-obs_x)**2 + (y-obs_y)**2 - 256
-        if equation(bulletx,bullety) <= 0:
-            movable = False
-            break
-        else:
-            movable = True
-
-    return movable
-
-
-def bullet_check_2(bulletx,bullety):
-    movable = True
-
-    for i,j in cord:
-        obs_x=i+14
-        obs_y=j+14
-        equation = lambda x,y: (x-obs_x)**2 + (y-obs_y)**2 - 256
-        if equation(bulletx,bullety) <= 0:
-            movable = False
-            break
-        else:
-            movable = True
-
-    return movable
-
-def tank_obstacle_check_1(tankx,tanky):
-    movable = True
-    for i, j in cord:
-        r=25
-        obs_x = i + r
-        obs_y = j + r  #added for extra obstruction
-        equation = lambda x, y: (x - obs_x) ** 2 + (y - obs_y) ** 2 - r**2
-        if equation(tankx, tanky) <= 0:
-            movable = False
-            break
-        else:
-            movable = True
-
-    return movable
-
-
-def tank_obstacle_check_2(tankx,tanky):
-    movable = True
-    for i, j in cord:
-        r=25
-        obs_x = i + r
-        obs_y = j + r  #added for extra obstruction
-        equation = lambda x, y: (x - obs_x) ** 2 + (y - obs_y) ** 2 - r**2
-        if equation(tankx, tanky) <= 0:
-            movable = False
-            break
-        else:
-            movable = True
-
-    return movable
-
 
 def draw():
-    global tank1, tank2,screen,new_image1,new_image2
-    screen = py.display.set_mode((800,800))
-    # screen.blit(background,[0,0])               #setting the background image
-    draw_obstacles(screen)
-    screen.blit(new_image_1,rect1)  # setting the tank1 pos
-    screen.blit(new_image_2,rect2)
-    py.display.flip()  # usded to view the updates on screen as soon as we see them.
+    screen.fill(color)
+    draw_obstacles()
+    screen.blit(Tank['tank1']['new_image'], Tank['tank1']['rect'])
+    screen.blit(Tank['tank2']['new_image'], Tank['tank2']['rect'])
+    py.display.update()
 
-def rotate_1(clock):
-    global new_image_1,old_center_1,rect1,tank_rot_1,new_image_2,old_center_2,rect2,tank_rot_2
-    screen = py.display.set_mode((800, 800))
-    draw_obstacles(screen)
-    old_center_1 = rect1.center
-    tank_rot_1 = (tank_rot_1 + (clock)*3) % 360
-    new_image_1 = py.transform.rotate(tank1,tank_rot_1)
-    rect1 = new_image_1.get_rect()
-    rect1.center = old_center_1
-    screen.blit(new_image_1,rect1)
-    screen.blit(new_image_2,rect2)
-    py.display.flip()
+def draw_obstacles():
+    for i,j in obstacles:
+        screen.blit(obstacle_image, (i,j))
 
-def rotate_2(clock):
-    global new_image_1,old_center_1,rect1,tank_rot_1,new_image_2,old_center_2,rect2,tank_rot_2
-    screen = py.display.set_mode((800, 800))
-    draw_obstacles(screen)
-    old_center_2 = rect2.center
-    tank_rot_2 = (tank_rot_2 + (clock)*3) % 360
-    new_image_2 = py.transform.rotate(tank2,tank_rot_2)
-    rect2 = new_image_2.get_rect()
-    rect2.center = old_center_2
-    screen.blit(new_image_2,rect2)
-    screen.blit(new_image_1,rect1)
-    py.display.flip()
+def rotate_tank(tank, clock):
+    tank['angle'] = (tank['angle'] + clock) % 360
+    tank['new_image'] = py.transform.rotate(tank['image'], tank['angle'])
+    tank['rect'] = tank['new_image'].get_rect()
+    tank['rect'].center = tank['center']
 
-def bullet_1(bullet_x,bullet_y):
-    global new_iamge_1,rect1,new_iamge_2,rect2
-    screen = py.display.set_mode((800,800))
-    draw_obstacles(screen)
-    screen.blit(new_image_1, rect1)  # setting the tank1 pos
-    screen.blit(new_image_2,rect2)
-    screen.blit(bullet1,(bullet_x,bullet_y))
-    py.display.flip()
+def translate(tank, direction):
+    r = 2
+    x,y = tank['center']
+    x += r*math.cos(math.radians(tank['angle']))*direction
+    y -= r*math.sin(math.radians(tank['angle']))*direction
+    boundary_condition = (0<x<800) and (0<y<800)
+    if obstacle_collision(x,y) or not boundary_condition:
+        return
+    if Tank['tank1'] == tank:
+        center_tank = Tank['tank2']['center']
+    else:
+        center_tank = Tank['tank1']['center']
 
-def bullet_2(bullet_x,bullet_y):
-    global new_iamge_1, rect1, new_iamge_2, rect2
-    screen = py.display.set_mode((800,800))
-    draw_obstacles(screen)
-    screen.blit(new_image_1, rect1)  # setting the tank1 pos
-    screen.blit(new_image_2, rect2)
-    screen.blit(bullet2,(bullet_x,bullet_y))
-    py.display.flip()
+    width, height = tank_dimensions[0], tank_dimensions[1]
+    condition1 = (center_tank[0]-width/2 < x < center_tank[0]+width/2)
+    condition2 = (center_tank[1]-height/2 < y < center_tank[1]+height/2)
+    if condition1 and condition2:
+        return
+    tank['center'] = (x,y)
+    tank['rect'].center = (x,y)
 
+def bullet_translate(bullet, tank):
+    bullet['rect'].center = tank['center']
+    x,y = bullet['rect'].center
+    r = 10
+    while 0 < x < 800 and 0 < y < 800:
+        x += r*math.cos(math.radians(tank['angle']))
+        y -= r*math.sin(math.radians(tank['angle']))
+        if obstacle_collision(x,y):
+            return
+        if Tank['tank1'] == tank:
+            center_tank = Tank['tank2']['center']
+        else:
+            center_tank = Tank['tank1']['center']
 
-def main():
-    global player_x1, player_y1,player_x2, player_y2,curr_y1,curr_y2,curr_x1,curr_x2,tank1,tank2,tank_rot_1,tank_rot_2
-    global rect1,rect2,new_image1,new_image2
-    global done
-    while not done:
+        width, height = tank_dimensions[0], tank_dimensions[1]
+        condition1 = (center_tank[0]-width/2 < x < center_tank[0]+width/2)
+        condition2 = (center_tank[1]-height/2 < y < center_tank[1]+height/2)
+        if condition1 and condition2:
+            if Tank['tank1'] == tank:
+                print("Player 1 Wins")
+                sys.exit(0)
+            else:
+                print("Player 2 Wins")
+                sys.exit(0)
+        bullet['rect'].center = (x,y)
+        draw()
+        screen.blit(bullet['image'], bullet['rect'])
+        py.display.update()
 
-        keys_pressed = py.key.get_pressed()
-
-        for event in py.event.get():
-            if event.type == py.QUIT:
-                done = True
-
-
-        #moving the first tank anti-clockwise
-        if keys_pressed[py.K_a]:
-            rotate_1(1)
-            draw()
-
-        # moving the first tank clockwise
-        if keys_pressed[py.K_d]:
-            rotate_1(-1)
-            draw()
-
-        #translation motion for the first tank.
-        if keys_pressed[py.K_w]:
-            (player_x1,player_y1) = rect1.center
-            r1 = 2
-            rad_to_deg = math.pi/180
-            temp_x_1 = player_x1 + r1*math.cos(tank_rot_1*rad_to_deg)
-            temp_y_1 = player_y1 - r1*math.sin(tank_rot_1 * rad_to_deg)
-            tank_movable_1 = tank_obstacle_check_1(temp_x_1,temp_y_1)
-            if tank_movable_1:
-                player_x1 += r1 * math.cos(tank_rot_1*rad_to_deg)
-                player_y1 -= r1 * math.sin(tank_rot_1*rad_to_deg)
-                rect1.center = (player_x1,player_y1)
-            draw()
-
-        #bullet from tank1
-        if keys_pressed[py.K_e]:
-            bullet_x1, bullet_y1 = rect1.center
-            while 0 < bullet_x1 < 800 and 0 < bullet_y1 < 800:
-                rb1 = 2
-                rad_to_deg = math.pi / 180
-                bullet_x1 += rb1 * math.cos(tank_rot_1 * rad_to_deg)
-                bullet_y1 -= rb1 * math.sin(tank_rot_1 * rad_to_deg)
-                movable_1 = bullet_check_1(bullet_x1,bullet_y1)
-                win1 = tank_1_win_check(bullet_x1,bullet_y1)
-                if win1:
-                    print('Player 1 wins')
-                    sys.exit(0)
-                if movable_1:
-                    bullet_1(bullet_x1, bullet_y1)
-                else:
-                    break
-
-        #moving the second tank anit-clockwise.
-        if keys_pressed[py.K_LEFT]:
-            rotate_2(1)
-            draw()
-        #moving the second tank clockwise.
-        if keys_pressed[py.K_RIGHT]:
-            rotate_2(-1)
-            draw()
-
-        # translation motion for the second tank.
-        if keys_pressed[py.K_UP]:
-            (player_x2, player_y2) = rect2.center
-            r2 = 2
-            rad_to_deg = math.pi / 180
-            temp_x_2 = player_x2 + r2 * math.cos(tank_rot_2 * rad_to_deg)
-            temp_y_2 = player_y2 - r2 * math.sin(tank_rot_2 * rad_to_deg)
-            tank_movable_2 = tank_obstacle_check_1(temp_x_2, temp_y_2)
-            if tank_movable_2:
-                player_x2 += r2 * math.cos(tank_rot_2 * rad_to_deg)
-                player_y2 -= r2 * math.sin(tank_rot_2 * rad_to_deg)
-                rect2.center = (player_x2, player_y2)
-            draw()
-
-        #bullet from tank2:
-        if keys_pressed[py.K_l]:
-            bullet_x2, bullet_y2 = rect2.center
-            while 0 < bullet_x2 < 800 and 0 < bullet_y2 < 800:
-                rb2 = 2
-                rad_to_deg = math.pi / 180
-                bullet_x2 += rb2 * math.cos(tank_rot_2 * rad_to_deg)
-                bullet_y2 -= rb2 * math.sin(tank_rot_2 * rad_to_deg)
-                bullet_2(bullet_x2, bullet_y2)
-                movable_2 = bullet_check_2(bullet_x2, bullet_y2)
-                win2 = tank_2_win_check(bullet_x2, bullet_y2)
-                if win2:
-                    print('Player 2 wins')
-                    sys.exit(0)
-                if movable_2:
-                    bullet_2(bullet_x2, bullet_y2)
-                else:
-                    break
-        py.display.flip()
-
-
-if __name__ == '__main__':
-    main()
+done = False
+while not done:
+    draw()
+    shots_fired1, shots_fired2 = False, False
+    keys_pressed = py.key.get_pressed()
+    for event in py.event.get():
+        if event.type == py.QUIT:
+            sys.exit()
+            done = True
+        
+        if event.type == py.KEYDOWN:
+            shots_fired1 = event.key == py.K_e
+            shots_fired2 = event.key == py.K_RSHIFT
+            
+    #Rotation
+    if keys_pressed[py.K_a]:
+        rotate_tank(Tank['tank1'], 1)
+    
+    if keys_pressed[py.K_d]:
+        rotate_tank(Tank['tank1'], -1)
+    
+    if keys_pressed[py.K_LEFT]:
+        rotate_tank(Tank['tank2'], 1)
+    
+    if keys_pressed[py.K_RIGHT]:
+        rotate_tank(Tank['tank2'], -1)
+    
+    #Translation
+    if keys_pressed[py.K_w]:
+        translate(Tank['tank1'],1)
+    if keys_pressed[py.K_UP]:
+        translate(Tank['tank2'],1)
+    if keys_pressed[py.K_s]:
+        translate(Tank['tank1'],-1)
+    if keys_pressed[py.K_DOWN]:
+        translate(Tank['tank2'],-1)
+    
+    #bullet-fire
+    if shots_fired1:
+        bullet_translate(Tank['tank1']['bullet'], Tank['tank1'])
+    if shots_fired2:
+        bullet_translate(Tank['tank2']['bullet'], Tank['tank2'])
+    
+    game_clock.tick(30)
 
