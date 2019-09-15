@@ -3,24 +3,25 @@ import sys, random, math
 
 screen = py.display.set_mode((800,800))
 py.init()
-tank_image = py.image.load('resized_tank_green.png')
+tank_image1 = py.image.load('resized_tank_green.png')
+tank_image2 = py.image.load('resized_tank_red.png')
 obstacle_image = py.image.load('rock.png')
 bullet_image = py.image.load('missile.png')
 
-tank_dimensions = tank_image.get_size()
+tank_dimensions = tank_image1.get_size()
 obstacle_dimensions = obstacle_image.get_size()
 bullet_dimensions = bullet_image.get_size()
 
 game_clock = py.time.Clock()
 
-tank_rect = tank_image.get_rect()
+tank_rect = tank_image1.get_rect()
 color = (0,0,0)
 
 Tank = {
     'tank1' : {
-        'image' : tank_image,
-        'new_image' : tank_image,
-        'rect' : tank_image.get_rect().copy(),
+        'image' : tank_image1,
+        'new_image' : tank_image1,
+        'rect' : tank_image1.get_rect().copy(),
         'center' : (25,25),
         'angle' : 0,
         'bullet' : {
@@ -30,9 +31,9 @@ Tank = {
     },
 
     'tank2' : {
-        'image' : tank_image,
-        'new_image' : tank_image,
-        'rect' : tank_image.get_rect().copy(),
+        'image' : tank_image2,
+        'new_image' : tank_image2,
+        'rect' : tank_image2.get_rect().copy(),
         'center' : (750,750),
         'angle' : 0,
         'bullet' : {
@@ -44,7 +45,7 @@ Tank = {
 
 Tank['tank1']['rect'].center = (25,25)
 Tank['tank2']['rect'].center = (750,750)
-obstacles = [(random.randint(40,750),random.randint(40,750)) for i in range(30)]
+obstacles = [(random.randint(40,700),random.randint(40,700)) for i in range(30)]
 
 #checks if the point x,y lies in the circle (x-x1)^2 + (y-y1)^2 = r^2
 def collision(x,y,x1,y1,r):
@@ -72,7 +73,7 @@ def draw_obstacles():
 
 def rotate_tank(tank, clock):
     tank['angle'] = (tank['angle'] + clock) % 360
-    tank['new_image'] = py.transform.rotate(tank_image, tank['angle'])
+    tank['new_image'] = py.transform.rotate(tank['image'], tank['angle'])
     tank['rect'] = tank['new_image'].get_rect()
     tank['rect'].center = tank['center']
 
