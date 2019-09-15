@@ -116,8 +116,12 @@ def bullet_translate(bullet, tank):
         condition1 = (center_tank[0]-width/2 < x < center_tank[0]+width/2)
         condition2 = (center_tank[1]-height/2 < y < center_tank[1]+height/2)
         if condition1 and condition2:
-            print('Game over!')
-            sys.exit()
+            if Tank['tank1'] == tank:
+                print("Player 1 Wins")
+                sys.exit(0)
+            else:
+                print("Player 2 Wins")
+                sys.exit(0)
         bullet['rect'].center = (x,y)
         draw()
         screen.blit(bullet['image'], bullet['rect'])
