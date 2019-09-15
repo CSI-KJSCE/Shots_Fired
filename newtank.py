@@ -5,7 +5,7 @@ screen = py.display.set_mode((800,800))
 py.init()
 tank_image1 = py.image.load('resized_tank_green.png')
 tank_image2 = py.image.load('resized_tank_red.png')
-obstacle_image = py.image.load('rock.png')
+obstacle_image = py.image.load('crateMetal.png')
 bullet_image = py.image.load('missile.png')
 
 tank_dimensions = tank_image1.get_size()
