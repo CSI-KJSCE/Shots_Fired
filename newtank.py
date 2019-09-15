@@ -5,6 +5,9 @@ import math
 screen = py.display.set_mode((800,800))
 py.init()
 tank_image = py.image.load('realtank.png')
+obstacle_image = py.image.load('rock.png')
+bullet_image = py.image.load('missile.png')
+
 tank_rect = tank_image.get_rect()
 color = (0,0,0)
 
@@ -14,7 +17,11 @@ Tank = {
         'new_image' : tank_image,
         'rect' : tank_image.get_rect().copy(),
         'center' : (25,25),
-        'angle' : 0
+        'angle' : 0,
+        'bullet' : {
+            'image' : bullet_image,
+            'rect' : bullet_image.get_rect()
+        }
     },
 
     'tank2' : {
@@ -22,12 +29,28 @@ Tank = {
         'new_image' : tank_image,
         'rect' : tank_image.get_rect().copy(),
         'center' : (750,750),
-        'angle' : 0
+        'angle' : 0,
+        'bullet' : {
+            'image' : bullet_image,
+            'rect' : bullet_image.get_rect()
+        }
     }    
 }
 
 Tank['tank1']['rect'].center = (25,25)
 Tank['tank2']['rect'].center = (750,750)
+obstacles = [(random.randint(40,750),random.randint(40,750)) for i in range(30)]
+
+def draw():
+    screen.fill(color)
+    draw_obstacles()
+    screen.blit(Tank['tank1']['new_image'], Tank['tank1']['rect'])
+    screen.blit(Tank['tank2']['new_image'], Tank['tank2']['rect'])
+    py.display.update()
+
+def draw_obstacles():
+    for i,j in obstacles:
+        screen.blit(obstacle_image, (i,j))
 
 def rotate_tank(tank, clock):
     tank['angle'] = (tank['angle'] + clock) % 360
@@ -43,13 +66,21 @@ def translate(tank):
     tank['center'] = (x,y)
     tank['rect'].center = (x,y)
 
+def bullet_translate(bullet, tank):
+    bullet['rect'].center = tank['center']
+    x,y = bullet['rect'].center
+    r = 2
+    while x < 800 and y < 800:
+        x += r*math.cos(math.radians(tank['angle']))
+        y -= r*math.sin(math.radians(tank['angle']))
+        bullet['rect'].center = (x,y)
+        draw()
+        screen.blit(bullet['image'], bullet['rect'])
+        py.display.update()
+
 done = False
 while not done:
-    screen.fill(color)
-    screen.blit(Tank['tank1']['new_image'], Tank['tank1']['rect'])
-    screen.blit(Tank['tank2']['new_image'], Tank['tank2']['rect'])
-    py.display.update()
-
+    draw()
     keys_pressed = py.key.get_pressed()
     for event in py.event.get():
         if event.type == py.QUIT:
@@ -73,4 +104,10 @@ while not done:
         translate(Tank['tank1'])
     if keys_pressed[py.K_UP]:
         translate(Tank['tank2'])
+    
+    #bullet-fire
+    if keys_pressed[py.K_e]:
+        bullet_translate(Tank['tank1']['bullet'], Tank['tank1'])
+    if keys_pressed[py.K_RSHIFT]:
+        bullet_translate(Tank['tank2']['bullet'], Tank['tank2'])
 
