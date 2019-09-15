@@ -69,8 +69,8 @@ def translate(tank):
 def bullet_translate(bullet, tank):
     bullet['rect'].center = tank['center']
     x,y = bullet['rect'].center
-    r = 2
-    while x < 800 and y < 800:
+    r = 7
+    while 0 < x < 800 and 0 < y < 800:
         x += r*math.cos(math.radians(tank['angle']))
         y -= r*math.sin(math.radians(tank['angle']))
         bullet['rect'].center = (x,y)
@@ -81,11 +81,18 @@ def bullet_translate(bullet, tank):
 done = False
 while not done:
     draw()
+    shots_fired1, shots_fired2 = False, False
     keys_pressed = py.key.get_pressed()
     for event in py.event.get():
         if event.type == py.QUIT:
+            sys.exit()
             done = True
-    
+
+        if event.type == py.KEYDOWN:
+            shots_fired1 = event.key == py.K_e
+            shots_fired2 = event.key == py.K_RSHIFT
+            
+    # print('Shots fired? begin',keys_pressed[py.K_e])
     #Rotation
     if keys_pressed[py.K_a]:
         rotate_tank(Tank['tank1'], 1)
@@ -106,8 +113,9 @@ while not done:
         translate(Tank['tank2'])
     
     #bullet-fire
-    if keys_pressed[py.K_e]:
+    if shots_fired1:
         bullet_translate(Tank['tank1']['bullet'], Tank['tank1'])
-    if keys_pressed[py.K_RSHIFT]:
+    if shots_fired2:
         bullet_translate(Tank['tank2']['bullet'], Tank['tank2'])
 
+    # print('Shots fired? end',keys_pressed[py.K_e])
