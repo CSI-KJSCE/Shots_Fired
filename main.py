@@ -1,7 +1,7 @@
 import pygame as py
 import sys, random, math
 
-screen = py.display.set_mode((800,800))
+screen = py.display.set_mode((700,700))
 py.init()
 tank_image1 = py.image.load('tank_green.png')
 tank_image2 = py.image.load('tank_red.png')
@@ -48,15 +48,17 @@ Tank['tank2']['rect'].center = (750,750)
 obstacles = [(random.randint(40,700),random.randint(40,700)) for i in range(30)]
 
 #checks if the point x,y lies in the circle (x-x1)^2 + (y-y1)^2 = r^2
-def collision(x,y,x1,y1,r):
+def collision(x,y,x1,y1,r,is_tank):
+    if is_tank:
+        r += tank_dimensions[0]/2
     term = (x-x1)**2 + (y-y1)**2
     return term <= r**2
 
-def obstacle_collision(x,y):
-    radius_obstacle = obstacle_dimensions[0]
+def obstacle_collision(x,y,is_tank):
+    radius_obstacle = obstacle_dimensions[0]/2
     for i,j in obstacles:
         i,j = i+radius_obstacle, j+radius_obstacle
-        if collision(x,y,i,j,radius_obstacle):
+        if collision(x,y,i,j,radius_obstacle,is_tank):
             return True
     return False
 
@@ -83,7 +85,7 @@ def translate(tank, direction):
     x += r*math.cos(math.radians(tank['angle']))*direction
     y -= r*math.sin(math.radians(tank['angle']))*direction
     boundary_condition = (0<x<800) and (0<y<800)
-    if obstacle_collision(x,y) or not boundary_condition:
+    if obstacle_collision(x,y,True) or not boundary_condition:
         return
     if Tank['tank1'] == tank:
         center_tank = Tank['tank2']['center']
@@ -105,7 +107,7 @@ def bullet_translate(bullet, tank):
     while 0 < x < 800 and 0 < y < 800:
         x += r*math.cos(math.radians(tank['angle']))
         y -= r*math.sin(math.radians(tank['angle']))
-        if obstacle_collision(x,y):
+        if obstacle_collision(x,y,False):
             return
         if Tank['tank1'] == tank:
             center_tank = Tank['tank2']['center']
@@ -126,6 +128,7 @@ def bullet_translate(bullet, tank):
         draw()
         screen.blit(bullet['image'], bullet['rect'])
         py.display.update()
+        game_clock.tick(30)
 
 done = False
 while not done:
