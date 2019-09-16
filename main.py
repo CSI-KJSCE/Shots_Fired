@@ -128,7 +128,6 @@ def bullet_translate(bullet, tank):
         draw()
         screen.blit(bullet['image'], bullet['rect'])
         py.display.update()
-        game_clock.tick(30)
 
 done = False
 while not done:
