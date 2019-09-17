@@ -1,7 +1,7 @@
 import pygame as py
 import sys, random, math
 
-screen = py.display.set_mode((700,700))
+screen = py.display.set_mode((800,800))
 py.init()
 tank_image1 = py.image.load('tank_green.png')
 tank_image2 = py.image.load('tank_red.png')
