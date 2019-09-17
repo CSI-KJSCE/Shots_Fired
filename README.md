@@ -5,8 +5,8 @@ Reference Draft for the workshop can be found [here](https://github.com/CSI-KJSC
 
 To run it,
 ```
-  pip install -r requirements.txt
   cd Shots_Fired
+  pip install -r requirements.txt
   python main.py
 ```
 
