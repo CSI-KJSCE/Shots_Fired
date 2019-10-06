@@ -172,5 +172,5 @@ while not done:
     if shots_fired2:
         bullet_translate(Tank['tank2']['bullet'], Tank['tank2'])
     
-    game_clock.tick(30)
+    game_clock.tick(60)
 
